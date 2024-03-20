@@ -1,7 +1,8 @@
 using System.Collections;
 using UnityEngine;
+using System;
 
-public class ClickCounet : MonoBehaviour, ICounterElement
+public class ClickCounter : MonoBehaviour, ICounterElement
 {
     [SerializeField] private int _count = 0;
 
@@ -9,14 +10,31 @@ public class ClickCounet : MonoBehaviour, ICounterElement
     private float _waitTimeInSecond = 0.5f;
     private bool _isCounting = true;
 
-    public int MaxCount => _count;
+    public event Action CountChanged;
 
-    private void Awake() => StartCoroutine(IncrementCount());
+    public int Count => _count;
 
     private void Update()
     {
         if (Input.GetMouseButton(0))
-            _isCounting = !_isCounting;
+            ToggleCounting();
+    }
+
+    private void ToggleCounting()
+    {
+        _isCounting = !_isCounting;
+
+        if (_coroutine != null)
+        {
+            StopCoroutine(_coroutine);
+            _coroutine = null;
+            _isCounting = false;
+        }
+        else
+        {
+            _coroutine = StartCoroutine(IncrementCount());
+            _isCounting = true;
+        }
     }
 
     public IEnumerator IncrementCount()
@@ -25,9 +43,8 @@ public class ClickCounet : MonoBehaviour, ICounterElement
 
         while (enabled)
         {
-            if (_isCounting)
-                _count++;
-
+            _count++;
+            CountChanged?.Invoke();
             yield return waitForSecond;
         }
     }
