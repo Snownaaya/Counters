@@ -8,7 +8,6 @@ public class ClickCounter : MonoBehaviour, ICounterElement
 
     private Coroutine _coroutine;
     private float _waitTimeInSecond = 0.5f;
-    private bool _isCounting = true;
 
     public event Action CountChanged;
 
@@ -22,18 +21,14 @@ public class ClickCounter : MonoBehaviour, ICounterElement
 
     private void ToggleCounting()
     {
-        _isCounting = !_isCounting;
-
         if (_coroutine != null)
         {
             StopCoroutine(_coroutine);
             _coroutine = null;
-            _isCounting = false;
         }
         else
         {
             _coroutine = StartCoroutine(IncrementCount());
-            _isCounting = true;
         }
     }
 
